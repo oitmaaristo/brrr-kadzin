@@ -6,9 +6,19 @@
 
 ---
 
+## 🚨 CC START HERE
+
+**Handoff:** [docs/HANDOFF-2026-02-13.md](docs/HANDOFF-2026-02-13.md)
+
+**Spec:** [work-orders/WO-SMC-001.md](work-orders/WO-SMC-001.md)
+
+**Task:** Build SMC AI MCP server in `smc-ai/src/`
+
+---
+
 ## Products
 
-### 🧠 Smart Money Concepts AI (Coming Soon)
+### 🧠 Smart Money Concepts AI (In Development)
 AI-powered analysis using ICT-style methodology:
 - Order Blocks detection
 - Fair Value Gap (FVG) analysis
@@ -18,7 +28,7 @@ AI-powered analysis using ICT-style methodology:
 - **Prop Firm Risk Manager** - Never blow your challenge again
 
 ### 🔌 MCP Servers
-- BingX MCP Server (In Development)
+- BingX MCP Server (Planned)
 - MEXC MCP Server (Planned)
 - Kraken MCP Server (Planned)
 
@@ -38,13 +48,13 @@ AI-powered analysis using ICT-style methodology:
 
 ```
 brrr-kadzin/
-├── smc-ai/              # Smart Money Concepts AI product
+├── smc-ai/              # Smart Money Concepts AI product ← CC WORKS HERE
 ├── mcp-servers/         # MCP server implementations
 │   ├── bingx/
 │   ├── mexc/
 │   └── kraken/
 ├── brand/               # Brand assets & guidelines
-├── docs/                # Documentation
+├── docs/                # Documentation & handoffs
 └── work-orders/         # Development specs
 ```
 
