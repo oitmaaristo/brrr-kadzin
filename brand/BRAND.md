@@ -3,8 +3,9 @@
 ## Logo
 
 **Primary:** `brrr.kadzin`
-- Font: Space Grotesk 600
+- Font: Outfit 600
 - The dot is part of the name (like a domain)
+- Dot color: Teal (#00d4aa)
 - Lowercase always
 
 **Short:** `bk`
@@ -21,7 +22,7 @@
 
 ## Typography
 
-- **Headers:** Space Grotesk 600
+- **Headers:** Outfit 600
 - **Body:** Inter 400
 - **Code:** JetBrains Mono
 
