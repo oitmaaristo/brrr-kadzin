@@ -68,3 +68,4 @@ brrr-kadzin/
 ---
 
 **BRRR Capital** | Tallinn, Estonia 🇪🇪
+# Brrr Kadzin oli siin 🖨️
