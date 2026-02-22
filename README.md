@@ -1,69 +1,34 @@
-# brrr.kadzin
-
-**Smart Money Concepts AI | MCP Servers | Trading Tools**
+# brrr.kadzin — BRRR Capital HQ
 
 > Make the printer go BRRR 🖨️💰
 
----
+Peakontor. Siit juhitakse kõiki BRRR Capital osakondi.
 
-## 🚨 CC START HERE
+## Quick Links
 
-**Handoff:** [docs/HANDOFF-2026-02-13.md](docs/HANDOFF-2026-02-13.md)
+- **[OPERATING-MANUAL.md](OPERATING-MANUAL.md)** — Kuidas me tööd teeme
+- **[memory/](memory/)** — Claudia lühiajaline mälu
+- **[work-orders/](work-orders/)** — Tööülesanded
 
-**Spec:** [work-orders/WO-SMC-001.md](work-orders/WO-SMC-001.md)
+## Osakonnad
 
-**Task:** Build SMC AI MCP server in `smc-ai/src/`
+| Osakond | Repo | Staatus |
+|---------|------|---------|
+| **brrr.printer** | [brrr-printer2](https://github.com/oitmaaristo/brrr-printer2) | Aktiivne |
+| **brrr.hankejuht** | [brrr-hankejuht](https://github.com/oitmaaristo/brrr-hankejuht) | Aktiivne |
+| **Prediction Markets** | `archive/` | Ootel |
 
----
-
-## Products
-
-### 🧠 Smart Money Concepts AI (In Development)
-AI-powered analysis using ICT-style methodology:
-- Order Blocks detection
-- Fair Value Gap (FVG) analysis
-- BOS/CHoCH market structure
-- Kill Zone timing
-- Liquidity sweep alerts
-- **Prop Firm Risk Manager** - Never blow your challenge again
-
-### 🔌 MCP Servers
-- BingX MCP Server (Planned)
-- MEXC MCP Server (Planned)
-- Kraken MCP Server (Planned)
-
----
-
-## Brand
-
-**brrr.kadzin** - Where Smart Money meets AI
-
-- Font: Space Grotesk 600
-- Colors: `#1a1a2e` (dark), `#00d4aa` (teal), `#4361ee` (blue)
-- Tone: Technical, confident, direct, no BS
-
----
-
-## Structure
+## Struktuur
 
 ```
-brrr-kadzin/
-├── smc-ai/              # Smart Money Concepts AI product ← CC WORKS HERE
-├── mcp-servers/         # MCP server implementations
-│   ├── bingx/
-│   ├── mexc/
-│   └── kraken/
-├── brand/               # Brand assets & guidelines
-├── docs/                # Documentation & handoffs
-└── work-orders/         # Development specs
+brrr-kadzin/          ← HQ
+├── OPERATING-MANUAL.md   ← Kuidas me töötame
+├── memory/               ← Claudia päevalogid
+├── work-orders/          ← WO-d kõigile osakondadele
+├── brand/                ← BRRR Capital brand
+├── archive/              ← Ootel projektid (SMC AI, MCP serverid)
+└── templates/            ← Mallid (WO, päevalogi jne)
 ```
-
----
-
-## Links
-
-- Website: (coming soon)
-- Apify: (coming soon)
 
 ---
 
