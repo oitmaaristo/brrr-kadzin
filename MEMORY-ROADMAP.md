@@ -5,6 +5,18 @@
 
 ---
 
+## ⭐ MIKS ME LOGISID KIRJUTAME — suur pilt
+
+Claudia mälu ulatub "osakonna ukseni" — ta teab mis projektid on, mis seis on, kes vastutab.
+Ukse taga on CC mälu (päevalogid). Tulevikus saab Claudia need **vektorandmebaasist** otsida:
+- Semantic search: "mis on CRM singleton'i viimane staatus?"
+- Kiire kontekst ilma kogu logi lugemata
+
+**See tähendab:** CC logid peavad olema struktureeritud ja sisukad — need on tulevase indexi sisu.
+Prügi sisse = prügi välja. Hea logi = kasulik otsing.
+
+---
+
 ## Põhimõtted
 
 1. **Mälu on infrastruktuur, mitte nice-to-have.** Ilma korraliku mäluta on iga uus sessioon nagu esimene päev tööl.
@@ -128,12 +140,17 @@ CC jälgib pidevalt tokenite kasutust. Kui 90% on ära kasutatud:
 ## Implementeerimise järjekord
 
 1. ✅ Claudia mälu kolinud HQ-sse (`brrr-kadzin/memory/`)
-2. ⬜ CC CLAUDE.md uuendamine printer2 repos (draft olemas: `drafts/02`)
-3. ⬜ CC CLAUDE.md uuendamine hankejuht repos (draft olemas: `drafts/03`)
+2. ✅ CC CLAUDE.md uuendamine printer2 repos
+3. ✅ CC CLAUDE.md uuendamine hankejuht repos
 4. ⬜ CC päevalogi struktuuri loomine igas repos
 5. ⬜ Flux setup (WO-001)
 6. ⬜ Esimene korrastamise tsükkel
-7. ⬜ BrrrKa mälustruktuur (kui valmib)
+7. ⬜ **TODO (tulevikus): Vektorandmebaas CC logidele**
+   - Tööriist: ChromaDB või Qdrant (VPS-il)
+   - Claudia saab semantic search'iga pärida CC mälu
+   - Eeldus: CC logid on struktureeritud ja sisukad (sammud 4-6 peavad olema tehtud)
+   - Eeldus: piisavalt logisid on kogunenud (vähemalt 2-4 nädalat)
+8. ⬜ BrrrKa mälustruktuur (kui valmib)
 
 ---
 
