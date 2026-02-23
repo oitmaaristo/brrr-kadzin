@@ -77,8 +77,8 @@ Formaat: tehti, otsused, probleemid, järgmine kord, õpitud.
 
 ### Repod
 - **Backend (Windows):** `C:\Users\Laptopid\Documents\GitHub\brrr-hankejuht\`
-- **Backend (VPS):** `/home/brrr/brrr-hankeradar/`
-- **Frontend:** `C:\Users\Laptopid\Documents\GitHub\hankejuht-frontend\` (Lovable/React)
+- **Backend (VPS):** `/home/brrr/brrr-hankeradar/` ← õige nimi VPS-il (Windows repos: brrr-hankejuht)
+- **Frontend:** Lovable sünkib otse `oitmaaristo/hankejuht` repoga (ei ole lokaalselt kloonitud)
 - **GitHub:** `oitmaaristo/brrr-hankejuht`
 
 ### Stack

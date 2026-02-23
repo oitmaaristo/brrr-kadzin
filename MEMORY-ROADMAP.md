@@ -22,7 +22,7 @@
 - **Formaat:** CLAUDE.md (CC), memories/userPreferences (Claudia), config (BrrrKa)
 - **Millal muutub:** Kui workflow muutub, uus agent lisandub, reeglid muutuvad
 
-### Lühiajaline mälu (muutub pidevalt)
+### Lühiajaline mälu (muutub pidevalt)  
 - **Mis see on:** Mis täna tehti, mis otsuseid tehti, mis on pooleli, mis ees ootab
 - **Kes muudab:** Iga agent ise (CC kirjutab oma logid, Claudia oma, BrrrKa oma)
 - **Formaat:** Päevalogid (`YYYY-MM-DD.md`)
@@ -31,7 +31,7 @@
 ### Korrastatud mälu (lühiajalisest saab pikaajaline)
 - **Mis see on:** Süsteemselt talletatud otsused, õpitud asjad, patterns
 - **Kes teeb:** CC teostab, Claudia annab juhised ja kontrollib
-- **Formaat:** Temaatilised failid (`decisions.md`, `learnings.md`, jne)
+- **Formaat:** Teemakoahsed failid (`decisions.md`, `learnings.md`, jne)
 - **Millal:** 1-2x nädalas
 
 ---
@@ -64,7 +64,7 @@
 
 **CLAUDE.md sisu (pikaajaline):**
 - Kes CC on, mis osakond
-- Delegeerimise loop (kirjutajad → vastandlik review → test → gatekeeper)
+- Tööahel (orkestraator → kirjutajad → review → test → gatekeeper)
 - Kuidas kanbanit kasutada
 - Kuidas lühimälu hoida (90% reegel)
 - Tehniline kontekst (repo, API-d, reeglid)
@@ -111,7 +111,7 @@ CC jälgib pidevalt tokenite kasutust. Kui 90% on ära kasutatud:
 
 ### Claudia kontrollib:
 1. Vaatab korrastatud failid üle
-2. Uuendab vajadusel pikaajalisi mälusid (CLAUDE.md, memories)
+2. Uuendab vajadusel pikaajalisi mäle (CLAUDE.md, memories)
 3. Märgib korrastamise tehtud
 
 ---
@@ -128,8 +128,8 @@ CC jälgib pidevalt tokenite kasutust. Kui 90% on ära kasutatud:
 ## Implementeerimise järjekord
 
 1. ✅ Claudia mälu kolinud HQ-sse (`brrr-kadzin/memory/`)
-2. ✅ CC CLAUDE.md uuendamine printer2 repos
-3. ✅ CC CLAUDE.md uuendamine hankejuht repos
+2. ⬜ CC CLAUDE.md uuendamine printer2 repos (draft olemas: `drafts/02`)
+3. ⬜ CC CLAUDE.md uuendamine hankejuht repos (draft olemas: `drafts/03`)
 4. ⬜ CC päevalogi struktuuri loomine igas repos
 5. ⬜ Flux setup (WO-001)
 6. ⬜ Esimene korrastamise tsükkel
