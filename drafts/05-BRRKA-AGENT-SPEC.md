@@ -1,6 +1,6 @@
 # BrrrKa (OpenClaw) — Agent Spec
 
-> Draft: 2026-02-22 (Claudia)
+> Draft: 2026-02-23 (Claudia)
 > Staatus: PLANEERIMISEL
 
 ---
@@ -27,15 +27,20 @@ BrrrKa on BRRR Capital autonoomne 24/7 agent, kes elab VPS-il ja hoolitseb selle
 ### 2. CC Gatekeeper
 - Kõik CC meeskonna tööd lähevad tema kaudu enne "Done" staatust
 - Kontrollib koodi kvaliteeti, testide olemasolu, speci vastavust
-- Võib tagasi lükata ja kommentaaridega tagasi saata
-- Kui BrrrKa ise annab CC-le töö, otsustab kas kogu ahel või ainult gatekeeper
+- Võib tagasi lükata — töö läheb algusesse ja alustab loopi uuesti
+- Alla 5 min töödel: review/testija optional, aga gatekeeper ALATI
 
-### 3. CC meeskonna tööandja (tulevikus)
+### 3. Delegeerija (sama reeglid nagu CC-l!)
+- Alla 5 min tööd: võib ise ära teha, gatekeeper vaatab üle
+- Üle 5 min tööd: delegeerib CC-le ja need läbivad kogu loopi
+- BrrrKa EI OLE erand delegeerimise reeglist
+
+### 4. CC meeskonna tööandja (ajapikku)
 - Alguses saab CC ülesanded Risto/Claudia käest kanbani kaudu
 - Ajapikku hakkab BrrrKa ise CC-le ülesandeid andma
-- BrrrKa märkab probleeme → loob ülesanded → CC lahendab → BrrrKa kinnitab
+- BrrrKa märkab probleeme → loob ülesanded kanbanisse → CC lahendab → BrrrKa kinnitab
 
-### 4. Suhtlus Ristoga
+### 5. Suhtlus Ristoga
 - Kuidas täpselt — TBD
 - EI OLE Telegram bot!
 - Võimalused: Flux kommentaarid, email, dashboard alerts, muu
