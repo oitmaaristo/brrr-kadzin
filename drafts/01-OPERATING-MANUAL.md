@@ -38,7 +38,7 @@ Igal tegevussuunal (repos) on oma CC meeskonnajuht. CC ei tee ise tööd — ta 
 |-------------|---------|---------|------------|
 | **CC Windows** | HQ — Risto/Claudia isiklik | Windows CMD | Risto/Claudia |
 | **CC Printer** | brrr.printer | VPS | BrrrKa |
-| **CC Hankejuht** | brrr.hankejuht | VPS | TBD |
+| **CC Hankejuht** | brrr.hankejuht | VPS | Simo |
 
 Tulevikus lisandub igale osakonnale ka oma OpenClaw instants.
 
@@ -74,11 +74,11 @@ Igal osakonnal on:
 - Pikemad tööd (üle 5 min) delegeerib CC-le ja need läbivad sama delegeerimise loopi
 
 ### 3.2 brrr.hankejuht
-**Vastutus:** Ehitushanked, pakkumiste koostamine, mahutabelid, hinnapakkumised
+**Vastutus:** Riigihangete agregaator — scraping, filtreerimine, kasutajatele kuvamine
 **Repo:** `oitmaaristo/brrr-hankejuht` (backend) + `oitmaaristo/hankejuht-frontend` (Lovable)
 **DB:** Supabase (qnmrinbjlvorauijkoqq)
 **Kanban:** Flux projekt `hankejuht`
-**Gatekeeper:** TBD
+**Gatekeeper:** Simo
 
 Sama delegeerimise loogika nagu brrr.printer.
 
@@ -108,30 +108,38 @@ CC ja BrrrKa on **meeskonnajuhid**. Nad ei tee ise tööd — nad **delegeerivad
          │
          ▼ Üle 5 min? Delegeerib:
 ┌──────────────────┐
-│  KIRJUTAJAD      │  ← 1-4 tk (nii palju kui vaja)
+│  KIRJUTAJAD      │  ← kuni 4 tk (nii palju kui vaja)
 └────────┬─────────┘
          ▼
-┌──────────────────┐
-│  REVIEW          │  ← 2 reviewerit, konsensus vajalik
-│  (konsensus!)    │──── Tagasi lükatud? ──→ Algusesse! ──→ KIRJUTAJAD
-└────────┬─────────┘
-         ▼ Kinnitatud
-┌──────────────────┐
-│  TESTIJA         │
-│                  │──── Testid ei läbi? ──→ Algusesse! ──→ KIRJUTAJAD
-└────────┬─────────┘
-         ▼ Testid läbitud
-┌──────────────────┐
-│  GATEKEEPER      │  ← BrrrKa (printer) / vastav agent
-│                  │──── Tagasi lükatud? ──→ Algusesse! ──→ KIRJUTAJAD
-└────────┬─────────┘
-         ▼ Heakskiidetud
-┌──────────────────┐
-│  KANBAN → Done   │  ← Risto/Claudia vaatab üle
-└──────────────────┘
+┌─────────────────────────────────────┐
+│  REVIEW 1          │  REVIEW 2      │
+│  (vaatab X asja)   │  (vaatab Y     │  ← VASTANDLIKUD — vaatavad ERI asju!
+│                    │   asja)        │     Nt: üks kood, teine äriloogika
+└──────────────────────┬──────────────┘
+         │                    │
+         └──── Konsensus? ────┘
+              │          │
+           Ei läbi    Konsensus!
+              │          ▼
+              └──→ Algusesse! → KIRJUTAJAD
+                            ▼
+                   ┌──────────────────┐
+                   │  TESTIJA         │
+                   │                  │──── Testid ei läbi? ──→ Algusesse! → KIRJUTAJAD
+                   └────────┬─────────┘
+                            ▼ Testid läbitud
+                   ┌──────────────────┐
+                   │  GATEKEEPER      │  ← BrrrKa (printer) / Simo (hankejuht) / vastav
+                   │                  │──── Tagasi lükatud? ──→ Algusesse! → KIRJUTAJAD
+                   └────────┬─────────┘
+                            ▼ Heakskiidetud
+                   ┌──────────────────┐
+                   │  KANBAN → Done   │  ← Risto/Claudia vaatab üle
+                   └──────────────────┘
 ```
 
-**NB:** Iga tagasilükkamine = töö läheb tagasi algusesse ja alustab loopi uuesti!
+**NB:** Iga tagasilükkamine = töö läheb tagasi ALGUSESSE kirjutajatele ja alustab loopi uuesti!
+**Review reegel:** Konsensus on KOHUSTUSLIK — kui üks lükkab tagasi, läheb tagasi kirjutajatele. Mõlemad peavad heaks kiitma.
 
 ### Lühi-tööde reegel (alla 5 min)
 

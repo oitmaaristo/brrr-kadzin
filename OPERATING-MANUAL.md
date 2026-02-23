@@ -2,7 +2,7 @@
 
 > "And let the money printers go BRRR!" 🖨️💰
 > 
-> Viimati uuendatud: 2026-02-22
+> Viimati uuendatud: 2026-02-23
 
 ---
 
@@ -27,18 +27,38 @@ BRRR Capital on AI-juhitud ettevõte, kus inimesed juhivad ja AI-d teostavad. Me
 | Agent | Roll | Kus töötab |
 |-------|------|------------|
 | **Claudia** | Risto hääle otsene edasikandja, nõustaja, planeerija, arhitekt, research. Organiseerib kõigi mälu. | Desktop Claude (Windows) |
-| **BrrrKa (OpenClaw)** | 24/7 autonoomne ops agent, kauplemisspetsialist, CC gatekeeper | VPS |
-| **CC meeskond** | Arendusahel: orkestraator → kirjutajad → review → test → gatekeeper | Claude Code (VPS + Windows) |
+| **BrrrKa (OpenClaw)** | 24/7 autonoomne ops agent, kauplemisspetsialist, CC gatekeeper | VPS (tulemas) |
+| **CC meeskonnad** | Meeskonnajuhid kes delegeerivad tööd | Mitu instantsi (vt allpool) |
+
+### CC meeskonnad
+
+Igal tegevussuunal (repos) on oma CC meeskonnajuht. CC ei tee ise tööd — ta **delegeerib**.
+
+| CC instants | Osakond | Asukoht | Gatekeeper |
+|-------------|---------|---------|------------|
+| **CC Windows** | HQ — Risto/Claudia isiklik | Windows CMD | Risto/Claudia |
+| **CC Printer** | brrr.printer | VPS | BrrrKa |
+| **CC Hankejuht** | brrr.hankejuht | VPS | Simo |
+
+Tulevikus lisandub igale osakonnale ka oma OpenClaw instants.
 
 ---
 
 ## 3. Osakonnad
+
+Igal osakonnal on:
+- Oma repo
+- Oma CC meeskonnajuht
+- Oma kanban (Flux), mida täidetakse jooksvalt
+- Oma gatekeeper
 
 ### 3.1 brrr.printer
 **Vastutus:** Autonoomne futuuridega kauplemine (PRINTER 2)
 **Vedaja:** BrrrKa (OpenClaw)
 **Repo:** `oitmaaristo/brrr-printer2`
 **Asukoht:** Windows `C:\Users\Laptopid\Documents\GitHub\brrr-printer2\` | VPS `/home/brrr/brrr-printer2/`
+**Kanban:** Flux projekt `printer`
+**Gatekeeper:** BrrrKa
 
 **Eesmärgid:**
 - Autonoomsus — töötab igavesti ilma sekkumiseta
@@ -50,14 +70,17 @@ BRRR Capital on AI-juhitud ettevõte, kus inimesed juhivad ja AI-d teostavad. Me
 - Hoolitseb et printer on õigesti seadistatud
 - Mõtleb välja uusi strateegiaid
 - Hoiab CC meeskonda töös
-- On CC ahela gatekeeper — ükski muudatus ei lähe live'i ilma BrrrKa heakskiiduta
+- On CC gatekeeper — ükski muudatus ei lähe live'i ilma BrrrKa heakskiiduta
+- Pikemad tööd (üle 5 min) delegeerib CC-le ja need läbivad sama delegeerimise loopi
 
 ### 3.2 brrr.hankejuht
-**Vastutus:** Ehitushanked, pakkumiste koostamine, mahutabelid, hinnapakkumised
+**Vastutus:** Riigihangete agregaator — scraping, filtreerimine, kasutajatele kuvamine
 **Repo:** `oitmaaristo/brrr-hankejuht` (backend) + `oitmaaristo/hankejuht-frontend` (Lovable)
 **DB:** Supabase (qnmrinbjlvorauijkoqq)
+**Kanban:** Flux projekt `hankejuht`
+**Gatekeeper:** Simo
 
-Sama CC ahela loogika nagu brrr.printer — orkestraator → kirjutajad → review → gatekeeper.
+Sama delegeerimise loogika nagu brrr.printer.
 
 ### 3.3 Prediction Markets (OOTEL)
 **Staatus:** Parklas. Polymarket wallet puudu, alustab $100 kui käivitub.
@@ -65,47 +88,80 @@ Sama CC ahela loogika nagu brrr.printer — orkestraator → kirjutajad → revi
 
 ---
 
-## 4. CC Tööahel (KOHUSTUSLIK!)
+## 4. Delegeerimise loogika (KÕIGILE!)
 
-CC ei tee KUNAGI tööd üksinda. Iga ülesanne läbib ahela:
+CC ja BrrrKa on **meeskonnajuhid**. Nad ei tee ise tööd — nad **delegeerivad**.
+
+### Delegeerimise loop
 
 ```
-┌─────────────────┐
-│  KANBAN (Flux)  │  ← Ülesanne tuleb siit
-└────────┬────────┘
+┌──────────────────┐
+│  KANBAN (Flux)   │  ← Ülesanne tuleb siit (Risto/Claudia/BrrrKa/CC ise)
+└────────┬─────────┘
          ▼
-┌─────────────────┐
-│  ORKESTRAATOR   │  ← Jagab töö kirjutajatele, jälgib progressi
-└────────┬────────┘
+┌──────────────────┐
+│ MEESKONNAJUHT    │  ← CC või BrrrKa — hindab ülesannet
+│ (CC / BrrrKa)    │  
+└────────┬─────────┘
+         │
+         ├─── Alla 5 min? ──→ Teeb ISE ära ──→ GATEKEEPER ──→ Done/Tagasi
+         │
+         ▼ Üle 5 min? Delegeerib:
+┌──────────────────┐
+│  KIRJUTAJAD      │  ← kuni 4 tk (nii palju kui vaja)
+└────────┬─────────┘
          ▼
-┌─────────────────┐
-│  KIRJUTAJAD     │  ← Kuni 4 paralleelselt, kirjutavad koodi
-│  (max 4 tk)     │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  REVIEW         │  ← 2 reviewer'it, konsensus VAJALIK
-│  (2x, konsensus)│
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  TESTIJA        │  ← Testib, kinnitab et töötab
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  GATEKEEPER     │  ← BrrrKa (printer) või vastav agent
-│  (BrrrKa)       │  ← Annab lõpliku heakskiidu
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│  KANBAN → Done  │  ← Läheb meile ülevaatamiseks
-└─────────────────┘
+┌─────────────────────────────────────┐
+│  REVIEW 1          │  REVIEW 2      │
+│  (vaatab X asja)   │  (vaatab Y     │  ← VASTANDLIKUD — vaatavad ERI asju!
+│                    │   asja)        │     Nt: üks kood, teine äriloogika
+└──────────────────────┬──────────────┘
+         │                    │
+         └──── Konsensus? ────┘
+              │          │
+           Ei läbi    Konsensus!
+              │          ▼
+              └──→ Algusesse! → KIRJUTAJAD
+                            ▼
+                   ┌──────────────────┐
+                   │  TESTIJA         │
+                   │                  │──── Testid ei läbi? ──→ Algusesse! → KIRJUTAJAD
+                   └────────┬─────────┘
+                            ▼ Testid läbitud
+                   ┌──────────────────┐
+                   │  GATEKEEPER      │  ← BrrrKa (printer) / Simo (hankejuht) / vastav
+                   │                  │──── Tagasi lükatud? ──→ Algusesse! → KIRJUTAJAD
+                   └────────┬─────────┘
+                            ▼ Heakskiidetud
+                   ┌──────────────────┐
+                   │  KANBAN → Done   │  ← Risto/Claudia vaatab üle
+                   └──────────────────┘
 ```
 
-**Erandid:**
-- Kui BrrrKa ise annab ülesande CC-le, võib BrrrKa otsustada kas kasutab kogu ahelat või on lihtsalt gatekeeper rollis
-- Ükski töö EI saa Done staatust enne CC heakskiitu
-- Done ei tähenda valmis — Done tähendab "Risto/Claudia vaatab üle"
+**NB:** Iga tagasilükkamine = töö läheb tagasi ALGUSESSE kirjutajatele ja alustab loopi uuesti!
+**Review reegel:** Konsensus on KOHUSTUSLIK — kui üks lükkab tagasi, läheb tagasi kirjutajatele. Mõlemad peavad heaks kiitma.
+
+### Lühi-tööde reegel (alla 5 min)
+
+Kui töö on lühem kui 5 minutit:
+- CC või BrrrKa **võib ise ära teha**
+- Review ja testija **võib vahele jätta**
+- Gatekeeper **vaatab IKKA üle** — seda ei jäeta vahele kunagi
+- Kehtib nii CC-le kui BrrrKa-le
+
+### Pikemad tööd (üle 5 min)
+
+- Läbivad ALATI kogu loopi
+- Kehtib nii CC-le kui BrrrKa-le
+- BrrrKa delegeerib pikemad tööd CC-le
+
+### Ülesannete loomine
+
+Ülesandeid kanbanisse saavad panna:
+- Risto
+- Claudia
+- BrrrKa
+- CC ise (kui märkab probleemi või vajadust)
 
 ---
 
@@ -115,7 +171,8 @@ CC ei tee KUNAGI tööd üksinda. Iga ülesanne läbib ahela:
 **Web UI:** `100.93.186.17:3000` (AINULT Tailscale!)
 **CLI:** `flux ready`, `flux task create`, jne
 
-### Projektid Flux'is:
+### Kanbanid:
+Igal osakonnal oma Flux projekt, mida täidetakse jooksvalt:
 - `printer` — PRINTER 2 arendus ja ops
 - `hankejuht` — Hankejuht platform
 - `hq` — HQ-taseme ülesanded, infra, ops
@@ -126,11 +183,15 @@ CC ei tee KUNAGI tööd üksinda. Iga ülesanne läbib ahela:
 - **P2** — Backlog
 
 ### Workflow:
-1. Risto + Claudia loovad ülesanded
-2. Ülesanded lähevad Flux'i
-3. BrrrKa / CC võtavad ülesandeid `flux ready` kaudu
-4. Töö käib CC ahela kaudu (vt punkt 4)
-5. Valmis töö → Kanban'is "Review" → Risto/Claudia vaatab üle
+1. Ükskõik kes loob ülesande kanbanisse
+2. CC/BrrrKa võtavad ülesandeid `flux ready` kaudu
+3. Töö käib delegeerimise loopi kaudu (vt punkt 4)
+4. Valmis töö → Kanban'is "Done" → Risto/Claudia vaatab üle
+
+### Miks kanban on oluline:
+- Annab ülevaate kõigi osakondade tööde seisust
+- Võimaldab hinnata tööde käiku
+- Kõik tööd peavad olema kanbanis — tööd mida pole kanbanis, ei tehta
 
 ---
 
@@ -153,7 +214,7 @@ CC ei tee KUNAGI tööd üksinda. Iga ülesanne läbib ahela:
 **Pikaajaline mälu (CLAUDE.md):**
 - Asub iga repo juurkaustas
 - Muudavad AINULT Risto ja Claudia
-- Sisu: kes CC on, workflow, ahela reeglid, kuidas kanban kasutada, vastutusala, kuidas lühimälu hoida
+- Sisu: kes CC on, workflow, delegeerimise reeglid, kuidas kanban kasutada, vastutusala, kuidas lühimälu hoida
 
 **Lühiajaline mälu (päevalogid):**
 - CC haldab ise
@@ -164,7 +225,7 @@ CC ei tee KUNAGI tööd üksinda. Iga ülesanne läbib ahela:
 
 **Korrastamine (1-2x nädalas):**
 - Claudia annab CC-le kindlad juhised päevalogide korrastamiseks
-- Kõik otsused, mis selles valdkonnas tehtud on, peavad olema süsteemselt talletatud
+- Kõik otsused peavad olema süsteemselt talletatud
 - Korrastatud info läheb pikaajalise mälu failidesse
 
 ### 6.3 BrrrKa (OpenClaw) mälu
@@ -206,6 +267,7 @@ Eraldi struktuur — Claudia organiseerib.
 - **Telegram bot ON SURNUD.** CC töötab AINULT otse VPS-is (ssh) või Windows CMD's.
 - **"Low priority" = ei tehta kunagi.** Kui vaja teha → TODO. Kui ei ole vaja → ära lisa.
 - **Dashboard UI: NO EMOJIS** tabs, buttons, headers'ites.
+- **Kanban on kohustuslik.** Tööd mida pole kanbanis, ei tehta.
 
 ---
 

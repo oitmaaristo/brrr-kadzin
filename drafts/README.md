@@ -1,6 +1,6 @@
 # Drafts — Risto ülevaatamiseks
 
-> Uuendatud: 2026-02-23, Claudia (Risto kommentaaride põhjal v2)
+> Uuendatud: 2026-02-23, Claudia (Risto kommentaaride põhjal v3)
 
 ---
 
@@ -9,12 +9,15 @@
 - CC ei ole ahel → CC on **meeskonnajuht kes delegeerib**
 - Mitu CC meeskonda: Windows (isiklik), printer (VPS), hankejuht (VPS)
 - **5-minuti reegel:** alla 5 min võib ise teha, gatekeeper ALATI üle vaatab
-- **Luup:** iga tagasilükkamine = algusesse tagasi
-- Kirjutajaid 1-4 (mitte alati 4)
+- **Review: VASTANDLIKUD** — Review 1 ja Review 2 vaatavad ERI asju. Konsensus = mõlemad peavad "läbi" ütlema, üks tagasilükkamine = algusesse!
+- **Luup:** iga tagasilükkamine = algusesse kirjutajatele tagasi
+- Kirjutajaid kuni 4 (nii palju kui vaja)
 - BrrrKa pikemad tööd läbivad sama loopi
 - Iga osakond oma kanban, jooksvalt täidetav
 - Ülesandeid saab ka ise panna
 - Tulevikus igal osakonnal ka oma OpenClaw
+- **Hankejuhi gatekeeper: Simo** (CC agent)
+- Hankejuht kirjeldus täpsustatud: agregaator, mitte pakkumiste koostaja
 
 ## Failid
 
@@ -26,9 +29,9 @@
 | 04 | `04-MEMORY-ROADMAP.md` | Mälu roadmap | `brrr-kadzin/MEMORY-ROADMAP.md` |
 | 05 | `05-BRRKA-AGENT-SPEC.md` | BrrrKa agent spec v2 | `brrr-kadzin/agents/brrka-spec.md` |
 
-## Mida Risto peab otsustama
+## Risto otsused ✅
 
-1. Kas delegeerimise loop on nüüd õige? (meeskonnajuht → kirjutajad → review → test → gatekeeper)
-2. Kas 5 minuti piir on paras? (alla 5 min ise, üle 5 min delegeeri)
-3. Kas hankejuhi gatekeeper on TBD või on see keegi konkreetne?
-4. Kas midagi puudu?
+1. ✅ Delegeerimise loop kinnitatud — vastandlikud reviewerid, konsensus kohustuslik, tagasilükkamine = algusesse
+2. ✅ 5 min piir kinnitatud
+3. ✅ Hankejuhi gatekeeper = **Simo** (CC agent)
+4. Kas midagi muud puudu? — TBD

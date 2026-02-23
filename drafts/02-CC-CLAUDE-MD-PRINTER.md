@@ -30,26 +30,30 @@ KANBAN (Flux) → ülesanne
        ├── Alla 5 min? ──→ Teed ISE ──→ GATEKEEPER ──→ Done/Tagasi
        │
        ▼ Üle 5 min? Delegeerid:
-  KIRJUTAJAD (1-4 tk, nii palju kui vaja)
+  KIRJUTAJAD (kuni 4 tk, nii palju kui vaja)
        │
-       │◄──────────── Tagasi lükatud? = algusesse!
+       │◄──────────────────────────────── Tagasi lükatud? = algusesse!
        ▼
-  REVIEW (2 reviewerit, konsensus vajalik)
+  REVIEW 1 (vaatab X) + REVIEW 2 (vaatab Y)
+  VASTANDLIKUD — vaatavad ERI asju!
+  Nt: üks hindab koodi kvaliteeti, teine äriloogikat/speci vastavust
+  Mõlemad peavad heaks kiitma = KONSENSUS
        │
-       │◄──────────── Tagasi lükatud? = algusesse!
-       ▼
+       │◄──────────────────────────────── Üks lükkab tagasi? = algusesse!
+       ▼ Konsensus saavutatud
   TESTIJA
        │
-       │◄──────────── Testid ei läbi? = algusesse!
+       │◄──────────────────────────────── Testid ei läbi? = algusesse!
        ▼
   GATEKEEPER (BrrrKa)
        │
-       │◄──────────── Tagasi lükatud? = algusesse!
+       │◄──────────────────────────────── Tagasi lükatud? = algusesse!
        ▼
   KANBAN → Done (Risto/Claudia vaatab üle)
 ```
 
-**IGA tagasilükkamine = töö läheb ALGUSESSE ja alustab loopi uuesti!**
+**IGA tagasilükkamine = töö läheb ALGUSESSE kirjutajatele ja alustab loopi uuesti!**
+**Review reegel:** Mõlemad reviewerid vaatavad ERI asju — üks ei asenda teist. Konsensus = mõlemad peavad "läbi" ütlema.
 
 ### 5-minuti reegel
 
