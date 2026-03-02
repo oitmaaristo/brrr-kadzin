@@ -39,3 +39,4 @@ coverage/
 *.pem
 *.key
 secrets/
+CLAUDE.md
