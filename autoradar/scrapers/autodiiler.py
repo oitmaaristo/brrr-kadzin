@@ -16,10 +16,17 @@ class AutodiilerScraper(BaseScraper):
     """
 
     PORTAL_NAME = "autodiiler"
-    BASE_URL = "https://www.autodiiler.ee"
+    BASE_URL = "https://autodiiler.ee"
 
     def build_search_url(self, params: dict) -> str:
-        """Build autodiiler.ee search URL."""
+        """Build autodiiler.ee search URL.
+
+        Confirmed URL patterns from Google index:
+        - Listing page: https://autodiiler.ee/en/vehicles
+        - Search page: https://autodiiler.ee/en/vehicles/search
+        - Individual: /en/vehicles/{numeric_id}
+        - Pagination: ?page=N
+        """
         query_parts = []
 
         brand = params.get("brand", "").lower()
@@ -39,7 +46,7 @@ class AutodiilerScraper(BaseScraper):
         if params.get("year_max"):
             query_parts.append(f"year_to={params['year_max']}")
 
-        url = f"{self.BASE_URL}/search"
+        url = f"{self.BASE_URL}/en/vehicles/search"
         if query_parts:
             url += "?" + "&".join(query_parts)
         return url
@@ -113,11 +120,14 @@ class AutodiilerScraper(BaseScraper):
                     continue
 
                 if href.startswith("/"):
-                    url = f"{self.BASE_URL}{href}"
+                    url = f"https://autodiiler.ee{href}"
                 else:
                     url = href
 
-                external_id_match = re.search(r"/(\d+)", href)
+                # autodiiler URLs: /en/vehicles/58773
+                external_id_match = re.search(r"/vehicles/(\d+)", href)
+                if not external_id_match:
+                    external_id_match = re.search(r"/(\d+)", href)
                 if not external_id_match:
                     external_id_match = re.search(r"[/-]([a-zA-Z0-9]{4,})$", href)
                 if not external_id_match:

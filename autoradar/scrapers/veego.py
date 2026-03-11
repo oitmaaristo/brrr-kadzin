@@ -16,11 +16,18 @@ class VeegoScraper(BaseScraper):
     """
 
     PORTAL_NAME = "veego"
-    BASE_URL = "https://www.veego.ee"
+    BASE_URL = "https://veego.ee"
 
     def build_search_url(self, params: dict) -> str:
-        """Build veego.ee search URL."""
-        # Try multiple URL patterns - veego may use /search, /autod, or similar
+        """Build veego.ee search URL.
+
+        Confirmed URL patterns from Google index:
+        - Listing page: https://veego.ee/en/used-vehicles
+        - Individual: /en/used-vehicles/{id}-{make}-{model}-{engine}
+        - Query params likely use JS filtering (not URL-based)
+        """
+        # veego.ee uses /en/used-vehicles as the listing page
+        # Query params are unverified - the site likely uses JS-based filtering
         query_parts = []
 
         brand = params.get("brand", "").lower()
@@ -40,7 +47,7 @@ class VeegoScraper(BaseScraper):
         if params.get("year_max"):
             query_parts.append(f"year_max={params['year_max']}")
 
-        url = f"{self.BASE_URL}/search"
+        url = f"{self.BASE_URL}/en/used-vehicles"
         if query_parts:
             url += "?" + "&".join(query_parts)
         return url
@@ -120,12 +127,14 @@ class VeegoScraper(BaseScraper):
                     continue
 
                 if href.startswith("/"):
-                    url = f"{self.BASE_URL}{href}"
+                    url = f"https://veego.ee{href}"
                 else:
                     url = href
 
-                # Extract ID
-                external_id_match = re.search(r"/(\d+)", href)
+                # Extract ID - veego URLs: /en/used-vehicles/514978-audi-rs-6-...
+                external_id_match = re.search(r"/used-vehicles/(\d+)", href)
+                if not external_id_match:
+                    external_id_match = re.search(r"/(\d+)", href)
                 if not external_id_match:
                     external_id_match = re.search(r"[/-]([a-zA-Z0-9]{4,})$", href)
                 if not external_id_match:
