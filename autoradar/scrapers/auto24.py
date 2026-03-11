@@ -11,35 +11,35 @@ logger = logging.getLogger(__name__)
 # auto24.ee brand codes (b parameter) - most common brands
 # Full list needs to be scraped from the search form dropdown
 BRAND_CODES = {
-    "audi": 6,
-    "bmw": 2,
-    "citroen": 27,
-    "dacia": 72,
-    "fiat": 26,
+    "audi": 2,
+    "bmw": 4,
+    "citroen": 20,
+    "dacia": 254,
+    "fiat": 14,
     "ford": 7,
-    "honda": 8,
-    "hyundai": 41,
-    "jaguar": 35,
-    "kia": 33,
-    "land rover": 36,
-    "lexus": 37,
-    "mazda": 16,
-    "mercedes-benz": 1,
-    "mini": 48,
-    "mitsubishi": 17,
-    "nissan": 18,
+    "honda": 1,
+    "hyundai": 34,
+    "jaguar": 36,
+    "kia": 25,
+    "land rover": 42,
+    "lexus": 35,
+    "mazda": 6,
+    "mercedes-benz": 12,
+    "mini": 144,
+    "mitsubishi": 3,
+    "nissan": 11,
     "opel": 5,
-    "peugeot": 3,
-    "porsche": 31,
-    "renault": 4,
-    "saab": 19,
-    "seat": 34,
+    "peugeot": 16,
+    "porsche": 140,
+    "renault": 19,
+    "saab": 17,
+    "seat": 22,
     "skoda": 40,
-    "subaru": 20,
-    "suzuki": 22,
-    "tesla": 83,
-    "toyota": 9,
-    "volkswagen": 11,
+    "subaru": 23,
+    "suzuki": 41,
+    "tesla": 642,
+    "toyota": 13,
+    "volkswagen": 8,
     "volvo": 10,
 }
 
@@ -67,24 +67,22 @@ TRANSMISSION_CODES = {
     "automaat": 2,
 }
 
-# Body type codes (e parameter)
+# Body type codes (j[] parameter) - verified from auto24.ee form
 BODY_TYPE_CODES = {
     "sedan": 1,
     "sedaan": 1,
-    "wagon": 2,
-    "universaal": 2,
-    "hatchback": 3,
-    "luukpära": 3,
-    "suv": 5,
-    "maastur": 5,
-    "coupe": 6,
-    "kupee": 6,
-    "cabriolet": 7,
-    "kabrio": 7,
-    "van": 8,
-    "kaubik": 8,
-    "minivan": 9,
-    "mpv": 9,
+    "hatchback": 2,
+    "luukpära": 2,
+    "wagon": 3,
+    "universaal": 3,
+    "mpv": 4,
+    "mahtuniversaal": 4,
+    "coupe": 5,
+    "kupee": 5,
+    "cabriolet": 6,
+    "kabriolett": 6,
+    "van": 10,
+    "kaubik": 10,
 }
 
 # Drive type codes (g parameter)
@@ -129,56 +127,50 @@ class Auto24Scraper(BaseScraper):
         if model_code:
             query["bw"] = model_code
 
-        # Price range
-        if params.get("price_min"):
-            query["ag"] = params["price_min"]
-        if params.get("price_max"):
-            query["ah"] = params["price_max"]
-
-        # Year range
+        # Year range (f1=from, f2=to)
         if params.get("year_min"):
-            query["ae"] = params["year_min"]
+            query["f1"] = params["year_min"]
         if params.get("year_max"):
-            query["af"] = params["year_max"]
+            query["f2"] = params["year_max"]
 
-        # Mileage
+        # Price range (g1=from, g2=to)
+        if params.get("price_min"):
+            query["g1"] = params["price_min"]
+        if params.get("price_max"):
+            query["g2"] = params["price_max"]
+
+        # Mileage max (l2)
         if params.get("mileage_max"):
-            query["aj"] = params["mileage_max"]
+            query["l2"] = params["mileage_max"]
 
-        # Fuel type
+        # Fuel type (h[])
         fuel = params.get("fuel_type", "").lower()
         if fuel and fuel in FUEL_CODES:
-            query["ak"] = FUEL_CODES[fuel]
+            query["h[]"] = FUEL_CODES[fuel]
 
-        # Transmission
+        # Transmission (i[])
         trans = params.get("transmission", "").lower()
         if trans and trans in TRANSMISSION_CODES:
-            query["f"] = TRANSMISSION_CODES[trans]
+            query["i[]"] = TRANSMISSION_CODES[trans]
 
-        # Body type
+        # Body type (j[])
         body = params.get("body_type", "").lower()
         if body and body in BODY_TYPE_CODES:
-            query["e"] = BODY_TYPE_CODES[body]
+            query["j[]"] = BODY_TYPE_CODES[body]
 
-        # Drive type
+        # Drive type (p[])
         drive = params.get("drive_type", "").lower()
         if drive and drive in DRIVE_TYPE_CODES:
-            query["g"] = DRIVE_TYPE_CODES[drive]
+            query["p[]"] = DRIVE_TYPE_CODES[drive]
 
-        # Engine volume (cm³)
-        if params.get("engine_min"):
-            query["ai"] = params["engine_min"]
-        if params.get("engine_max"):
-            query["al"] = params["engine_max"]
-
-        # Power (kW)
+        # Power (kW) (k1=from, k2=to)
         if params.get("power_min"):
-            query["am"] = params["power_min"]
+            query["k1"] = params["power_min"]
         if params.get("power_max"):
-            query["an"] = params["power_max"]
+            query["k2"] = params["power_max"]
 
-        # Sort by newest first
-        query["by"] = params.get("sort_by", "3")
+        # Sort by date added newest first
+        query["ae"] = "1"
 
         return f"{self.BASE_URL}?{urlencode(query)}"
 
@@ -199,11 +191,14 @@ class Auto24Scraper(BaseScraper):
                 logger.warning(f"[auto24] Got status {response.status if response else 'None'}")
                 return listings
 
-            # Wait for results to load
-            await page.wait_for_selector(
-                "#usedVehiclesSearchResult-flex, .result-row, .no-results",
-                timeout=15000,
-            )
+            # Wait for results to load (non-fatal - parse whatever we have)
+            try:
+                await page.wait_for_selector(
+                    "#usedVehiclesSearchResult-flex, .result-row, .no-results",
+                    timeout=15000,
+                )
+            except Exception:
+                logger.debug("[auto24] Selector wait timed out, parsing current page content")
 
             # Small delay to let dynamic content load
             await self._random_delay(0.5, 1.5)
@@ -330,8 +325,8 @@ class Auto24Scraper(BaseScraper):
 
     def _extract_id(self, url: str) -> str | None:
         """Extract listing ID from auto24.ee URL."""
-        # Pattern: /kasutatud/1234567 or /used/1234567
-        match = re.search(r"/(?:kasutatud|used)/(\d+)", url)
+        # Patterns: /soidukid/1234567, /kasutatud/1234567, /used/1234567
+        match = re.search(r"/(?:soidukid|kasutatud|used)/(\d+)", url)
         if match:
             return match.group(1)
         # Fallback: any long number sequence in URL

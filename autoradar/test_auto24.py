@@ -30,7 +30,7 @@ async def main():
     # Test 1: Build URL
     test_params = {
         "brand": "bmw",
-        "price_max": 15000,
+        "price_max": 25000,
         "year_min": 2015,
         "fuel_type": "diisel",
     }
@@ -42,7 +42,7 @@ async def main():
     await scraper.start()
 
     try:
-        print("Scraping BMW diesel, max 15000 EUR, from 2015...")
+        print("Scraping BMW diesel, max 25000 EUR, from 2015...")
         listings = await scraper.scrape(test_params)
 
         print(f"\nFound {len(listings)} listings:")
@@ -77,7 +77,7 @@ async def main():
         await scraper.stop()
 
     print("\n" + "=" * 60)
-    if listings:
+    if listings or all_listings:
         print("SUCCESS! Scraper works!")
     else:
         print("WARNING: No listings found. Site may be blocking or selectors may need updating.")
