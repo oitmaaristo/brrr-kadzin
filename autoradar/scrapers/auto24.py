@@ -341,15 +341,28 @@ class Auto24Scraper(BaseScraper):
         return None
 
     def _parse_price(self, row) -> int | None:
-        """Extract price as integer from a listing row."""
-        # Try various selectors
-        for selector in [".price", '[class*="price"]', "span.price"]:
+        """Extract price as integer from a listing row.
+
+        auto24.ee price text starts with a currency symbol (first char stripped).
+        Price is in a span.price element, often nested inside another span.
+        """
+        # Primary: span.price (confirmed selector)
+        el = row.select_one("span.price")
+        if el:
+            text = el.get_text(strip=True)
+            # Strip leading currency symbol
+            if text and not text[0].isdigit():
+                text = text[1:]
+            return self._text_to_int(text)
+
+        # Fallback selectors
+        for selector in [".price", '[class*="price"]']:
             el = row.select_one(selector)
             if el:
                 text = el.get_text(strip=True)
                 return self._text_to_int(text)
 
-        # Try XPath-like approach: look for € sign
+        # Last resort: look for currency sign
         for span in row.select("span"):
             text = span.get_text(strip=True)
             if "€" in text or "EUR" in text:
@@ -375,9 +388,13 @@ class Auto24Scraper(BaseScraper):
 
     @staticmethod
     def _text_to_int(text: str) -> int | None:
-        """Convert text like '14 500 €' or '87 000 km' to int."""
-        # Remove everything except digits
-        digits = re.sub(r"[^\d]", "", text)
+        """Convert text like '14 500 €' or '87 000 km' to int.
+
+        Handles non-breaking spaces (\xa0) which auto24.ee uses in mileage.
+        """
+        # Replace non-breaking spaces and remove everything except digits
+        cleaned = text.replace("\xa0", "")
+        digits = re.sub(r"[^\d]", "", cleaned)
         if digits:
             return int(digits)
         return None
