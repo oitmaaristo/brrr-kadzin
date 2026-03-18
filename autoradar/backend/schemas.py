@@ -23,6 +23,7 @@ class FilterParams(BaseModel):
     color: str | None = None
     location: str | None = None
     seller_type: str | None = None
+    exclude_keywords: str | None = None  # Comma-separated words to exclude from title
 
 
 class FilterCreate(BaseModel):
@@ -49,6 +50,16 @@ class FilterResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PriceHistoryResponse(BaseModel):
+    id: int
+    listing_id: int
+    old_price: int | None
+    new_price: int | None
+    changed_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class ListingResponse(BaseModel):
     id: int
     portal: str
@@ -61,10 +72,14 @@ class ListingResponse(BaseModel):
     fuel_type: str | None
     transmission: str | None
     body_type: str | None
+    power_kw: int | None
+    drive_type: str | None
     location: str | None
     image_url: str | None
+    reg_number: str | None
     first_seen_at: datetime
     notified_at: datetime | None
+    price_history: list[PriceHistoryResponse] = []
 
     model_config = {"from_attributes": True}
 

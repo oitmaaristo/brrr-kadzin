@@ -7,8 +7,8 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from backend.config import settings
-from backend.database import Listing, SearchFilter, SessionLocal
-from bot.notifications import send_listing_notification, send_status_message
+from backend.database import Listing, PriceHistory, SearchFilter, SessionLocal
+from bot.notifications import send_listing_notification, send_price_change_notification, send_status_message
 from scrapers.auto24 import Auto24Scraper
 from scrapers.autoportaal import AutoportaalScraper
 from scrapers.autodiiler import AutodiilerScraper
@@ -163,12 +163,37 @@ class ScraperScheduler:
                 if existing:
                     # Update price if changed (price tracking)
                     if car.price and existing.price and car.price != existing.price:
+                        old_price = existing.price
                         logger.info(
                             f"[{car.portal}] Price changed for {car.title}: "
-                            f"{existing.price} -> {car.price}"
+                            f"{old_price} -> {car.price}"
                         )
+
+                        # Record price history
+                        price_record = PriceHistory(
+                            listing_id=existing.id,
+                            old_price=old_price,
+                            new_price=car.price,
+                        )
+                        db.add(price_record)
                         existing.price = car.price
                         db.commit()
+
+                        # Send price change notification
+                        try:
+                            listing_dict = {
+                                "portal": existing.portal,
+                                "title": existing.title,
+                                "price": car.price,
+                                "old_price": old_price,
+                                "year": existing.year,
+                                "mileage": existing.mileage,
+                                "url": existing.url,
+                            }
+                            await send_price_change_notification(listing_dict)
+                        except Exception as e:
+                            logger.error(f"Failed to notify price change for listing {existing.id}: {e}")
+
                     continue
 
                 # New listing - save to DB

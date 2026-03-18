@@ -81,10 +81,11 @@ def format_listing_message(listing: dict, check_data: dict | None = None) -> str
                 total = lkf_data.get("total_amount", "teadmata")
                 lines.append(f"  ! LKF: {accidents} kahjujuhtum(it), kokku {total} EUR")
 
-    # Link
+    # Link + quick check links
+    lines.append("")
     if url:
-        lines.append("")
         lines.append(f'<a href="{url}">Vaata kuulutust</a>')
+    lines.append('<a href="https://eteenindus.mnt.ee/public/soidukTaustakontroll.jsf">Transpordiamet</a> · <a href="https://vs.lkf.ee">LKF</a> · <a href="https://www.vininfo.ee">Vininfo</a>')
 
     return "\n".join(lines)
 
@@ -128,6 +129,81 @@ async def send_listing_notification(listing: dict, check_data: dict | None = Non
 
     except Exception as e:
         logger.error(f"Failed to send Telegram notification: {e}")
+
+
+def format_price_change_message(listing: dict) -> str:
+    """Format a price change notification as a Telegram message.
+
+    Args:
+        listing: Dict with listing data including old_price and new price.
+
+    Returns:
+        Formatted message string with HTML markup.
+    """
+    portal_display = {
+        "auto24": "auto24.ee",
+        "autoportaal": "autoportaal.ee",
+        "veego": "veego.ee",
+        "autodiiler": "autodiiler.ee",
+    }
+
+    portal = portal_display.get(listing.get("portal", ""), listing.get("portal", ""))
+    title = listing.get("title", "Tundmatu auto")
+    old_price = listing.get("old_price")
+    new_price = listing.get("price")
+    year = listing.get("year")
+    mileage = listing.get("mileage")
+    url = listing.get("url", "")
+
+    price_diff = (new_price or 0) - (old_price or 0)
+    emoji = "\U0001f4c9" if price_diff < 0 else "\U0001f4c8"
+
+    lines = [f"{emoji} <b>Hinna muutus: {title}</b>"]
+
+    details = [portal]
+    if year:
+        details.append(str(year))
+    if mileage:
+        details.append(f"{mileage:,} km".replace(",", " "))
+    lines.append(" | ".join(details))
+
+    lines.append("")
+    old_str = f"{old_price:,}".replace(",", " ") if old_price else "?"
+    new_str = f"{new_price:,}".replace(",", " ") if new_price else "?"
+    diff_str = f"{price_diff:+,}".replace(",", " ").replace("+", "+").replace("- ", "-")
+    lines.append(f"\U0001f4b0 {old_str} EUR \u2192 {new_str} EUR ({diff_str} EUR)")
+
+    lines.append("")
+    if url:
+        lines.append(f'<a href="{url}">Vaata kuulutust</a>')
+    lines.append('<a href="https://eteenindus.mnt.ee/public/soidukTaustakontroll.jsf">Transpordiamet</a> \u00b7 <a href="https://vs.lkf.ee">LKF</a> \u00b7 <a href="https://www.vininfo.ee">Vininfo</a>')
+
+    return "\n".join(lines)
+
+
+async def send_price_change_notification(listing: dict):
+    """Send a Telegram notification about a price change.
+
+    Args:
+        listing: Dict with listing data including old_price.
+    """
+    if not settings.telegram_bot_token or not settings.telegram_chat_id:
+        logger.warning("Telegram not configured, skipping notification")
+        return
+
+    bot = Bot(token=settings.telegram_bot_token)
+    message = format_price_change_message(listing)
+
+    try:
+        await bot.send_message(
+            chat_id=settings.telegram_chat_id,
+            text=message,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=False,
+        )
+        logger.info(f"Price change notification sent for {listing.get('title', 'unknown')}")
+    except Exception as e:
+        logger.error(f"Failed to send price change notification: {e}")
 
 
 async def send_status_message(text: str):

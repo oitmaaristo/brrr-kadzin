@@ -63,6 +63,7 @@ class Listing(Base):
     notified_at = Column(DateTime, nullable=True)
 
     vehicle_checks = relationship("VehicleCheck", back_populates="listing")
+    price_history = relationship("PriceHistory", back_populates="listing", order_by="PriceHistory.changed_at.desc()")
 
     __table_args__ = (UniqueConstraint("portal", "external_id", name="uq_portal_external_id"),)
 
@@ -79,6 +80,18 @@ class VehicleCheck(Base):
     checked_at = Column(DateTime, default=datetime.utcnow)
 
     listing = relationship("Listing", back_populates="vehicle_checks")
+
+
+class PriceHistory(Base):
+    __tablename__ = "price_history"
+
+    id = Column(Integer, primary_key=True)
+    listing_id = Column(Integer, ForeignKey("listings.id"), nullable=False)
+    old_price = Column(Integer)
+    new_price = Column(Integer)
+    changed_at = Column(DateTime, default=datetime.utcnow)
+
+    listing = relationship("Listing", back_populates="price_history")
 
 
 def get_db() -> Session:

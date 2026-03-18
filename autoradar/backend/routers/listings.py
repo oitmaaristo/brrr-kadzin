@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from backend.database import Listing, VehicleCheck, get_db
-from backend.schemas import ListingResponse, VehicleCheckResponse
+from backend.database import Listing, PriceHistory, VehicleCheck, get_db
+from backend.schemas import ListingResponse, PriceHistoryResponse, VehicleCheckResponse
 from checks.runner import run_vehicle_check
 
 router = APIRouter(prefix="/api/listings", tags=["listings"])
@@ -43,6 +43,11 @@ def get_listing_check(listing_id: int, db: Session = Depends(get_db)):
         .first()
     )
     return check
+
+
+@router.get("/{listing_id}/price-history", response_model=list[PriceHistoryResponse])
+def get_price_history(listing_id: int, db: Session = Depends(get_db)):
+    return db.query(PriceHistory).filter(PriceHistory.listing_id == listing_id).order_by(PriceHistory.changed_at.desc()).all()
 
 
 @router.post("/{listing_id}/check", response_model=VehicleCheckResponse)

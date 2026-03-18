@@ -114,8 +114,9 @@ class Auto24Scraper(BaseScraper):
         """
         query = {}
 
-        # Category: default to passenger cars + SUVs
-        query["a"] = params.get("category", "100")
+        # Category: passenger cars + SUVs (101102) or vans (103)
+        # Default to cars+SUVs; caller can override for vans
+        query["a"] = params.get("category", "101102")
 
         # Brand
         brand = params.get("brand", "").lower()
@@ -174,24 +175,19 @@ class Auto24Scraper(BaseScraper):
 
         return f"{self.BASE_URL}?{urlencode(query)}"
 
-    async def scrape(self, params: dict) -> list[CarListing]:
-        """Scrape auto24.ee listings matching the given parameters."""
+    async def _scrape_category(self, params: dict, page) -> list[CarListing]:
+        """Scrape a single auto24 category page."""
         url = self.build_search_url(params)
         logger.info(f"[auto24] Scraping: {url}")
 
-        page = await self._new_page()
-        listings = []
-
         try:
-            # Navigate to search results
             await self._random_delay(1.0, 2.5)
             response = await page.goto(url, wait_until="domcontentloaded", timeout=30000)
 
             if not response or response.status != 200:
                 logger.warning(f"[auto24] Got status {response.status if response else 'None'}")
-                return listings
+                return []
 
-            # Wait for results to load (non-fatal - parse whatever we have)
             try:
                 await page.wait_for_selector(
                     "#usedVehiclesSearchResult-flex, .result-row, .no-results",
@@ -200,14 +196,45 @@ class Auto24Scraper(BaseScraper):
             except Exception:
                 logger.debug("[auto24] Selector wait timed out, parsing current page content")
 
-            # Small delay to let dynamic content load
             await self._random_delay(0.5, 1.5)
-
-            # Get page HTML
             html = await page.content()
-            listings = self._parse_listings(html)
+            return self._parse_listings(html)
+        except Exception as e:
+            logger.error(f"[auto24] Category scrape error: {e}")
+            return []
 
-            logger.info(f"[auto24] Found {len(listings)} listings")
+    async def scrape(self, params: dict) -> list[CarListing]:
+        """Scrape auto24.ee listings matching the given parameters.
+
+        Scrapes both passenger cars+SUVs (a=101102) and vans (a=103).
+        """
+        page = await self._new_page()
+        listings = []
+
+        try:
+            # Scrape cars + SUVs
+            car_params = {**params, "category": "101102"}
+            listings.extend(await self._scrape_category(car_params, page))
+
+            # Scrape vans (kaubikud)
+            van_params = {**params, "category": "103"}
+            listings.extend(await self._scrape_category(van_params, page))
+
+            # Client-side filtering for exclude keywords and mileage backup
+            mileage_max = params.get("mileage_max")
+            exclude_keywords = [kw.strip().lower() for kw in params.get("exclude_keywords", "").split(",") if kw.strip()] if params.get("exclude_keywords") else []
+            if exclude_keywords or mileage_max:
+                filtered = []
+                for car in listings:
+                    if mileage_max and car.mileage and car.mileage > mileage_max:
+                        continue
+                    if exclude_keywords and car.title:
+                        if any(kw in car.title.lower() for kw in exclude_keywords):
+                            continue
+                    filtered.append(car)
+                listings = filtered
+
+            logger.info(f"[auto24] Found {len(listings)} listings total (cars+SUVs+vans)")
 
         except Exception as e:
             logger.error(f"[auto24] Scraping error: {e}")
@@ -302,11 +329,22 @@ class Auto24Scraper(BaseScraper):
         location_el = row.select_one(".location") or row.select_one('[class*="location"]')
         location = location_el.get_text(strip=True) if location_el else None
 
-        # Image
-        img_el = row.select_one("img")
+        # Image - auto24.ee uses background-image on span.thumb, not <img> tags.
+        # The <img> tags in listing rows are icons (fuel.png, priority_star.svg, etc.)
         image_url = None
-        if img_el:
-            image_url = img_el.get("src") or img_el.get("data-src")
+        thumb_el = row.select_one("span.thumb[style]") or row.select_one(".thumb[style]")
+        if thumb_el:
+            style = thumb_el.get("style", "")
+            bg_match = re.search(r"background-image:\s*url\(['\"]?([^'\")\s]+)['\"]?\)", style)
+            if bg_match:
+                image_url = bg_match.group(1)
+        if not image_url:
+            # Fallback: try to find an <img> that is an actual car photo, not an icon
+            for img_el in row.select("img"):
+                src = img_el.get("data-src") or img_el.get("src") or ""
+                if src and "/images/icons/" not in src and not src.endswith(".svg") and "data:image" not in src:
+                    image_url = src
+                    break
 
         return CarListing(
             portal="auto24",
